@@ -15,6 +15,45 @@ router.get("/", async (req, res) => {
   return res.send(courseFound);
 });
 
+//用講師id尋找課程
+router.get("/instructor/:_instructor_id", async (req, res) => {
+  let { _instructor_id } = req.params;
+  try {
+    let coursesFound = await Course.find({ instructor: _instructor_id })
+      .populate("instructor", ["username", "email"])
+      .exec();
+    return res.send(coursesFound);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+//用學生id尋找課程
+router.get("/student/:_student_id", async (req, res) => {
+  let { _student_id } = req.params;
+  try {
+    let coursesFound = await Course.find({ students: _student_id })
+      .populate("instructor", ["username", "email"])
+      .exec();
+    return res.send(coursesFound);
+  } catch (e) {
+    console.log(e);
+  }
+});
+
+//用課程名稱尋找課程
+router.get("/findByName/:name", async (req, res) => {
+  let { name } = req.params;
+  try {
+    let courseFound = await Course.find({ title: name })
+      .populate("instructor", ["email", "username"])
+      .exec();
+    return res.send(courseFound);
+  } catch (e) {
+    return res.status(500).send(e);
+  }
+});
+
 //用id尋找課程
 router.get("/:_id", async (req, res) => {
   let { _id } = req.params;
@@ -54,6 +93,20 @@ router.post("/", async (req, res) => {
     });
   } catch (e) {
     return res.status(500).send("無法創建課程...");
+  }
+});
+
+//讓學生透過課程id註冊課程
+router.post("/enroll/:_id", async (req, res) => {
+  let { _id } = req.params;
+  try {
+    let course = await Course.findOne({ _id }).exec();
+    //儲存學生id ,數量
+    course.students.push(req.user._id);
+    await course.save();
+    res.send("註冊完成");
+  } catch (e) {
+    console.log(e);
   }
 });
 

@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CourseService from "../services/course.service";
 
-const EnrollComponent = (props) => {
-  let { currentUser, setCurrentUser } = props;
+const EnrollComponent = ({ currentUser, setCurrentUser }) => {
   const navigate = useNavigate();
   let [searchInput, setSearchInput] = useState("");
   let [searchResult, setSearchResult] = useState(null);
@@ -16,7 +15,6 @@ const EnrollComponent = (props) => {
   const handleSearch = () => {
     CourseService.getCourseByName(searchInput)
       .then((data) => {
-        console.log(data);
         setSearchResult(data.data);
       })
       .catch((err) => {
@@ -65,26 +63,35 @@ const EnrollComponent = (props) => {
         </div>
       )}
       {currentUser && searchResult && searchResult.length != 0 && (
-        <div>
-          <p>我們從 API 返回的數據。</p>
-          {searchResult.map((course) => (
-            <div key={course._id} className="card" style={{ width: "18rem" }}>
-              <div className="card-body">
-                <h5 className="card-title">課程名稱：{course.title}</h5>
-                <p className="card-text">{course.description}</p>
-                <p>價格: {course.price}</p>
-                <p>目前的學生人數: {course.students.length}</p>
-                <a
-                  href="#"
-                  onClick={handleEnroll}
-                  className="card-text btn btn-primary"
-                  id={course._id}
-                >
-                  註冊課程
-                </a>
+        <div
+          style={{
+            padding: "5rem",
+            paddingLeft: "1rem",
+            display: "flex",
+            justifyContent: "space-around",
+            flexWrap: "wrap",
+          }}
+        >
+          {searchResult.map((course) => {
+            return (
+              <div key={course._id} className="card" style={{ width: "18rem" }}>
+                <div className="card-body">
+                  <h5 className="card-title">課程名稱：{course.title}</h5>
+                  <p className="card-text">{course.description}</p>
+                  <p>價格: {course.price}</p>
+                  <p>目前的學生人數: {course.students.length}</p>
+                  <a
+                    href="#"
+                    onClick={handleEnroll}
+                    className="card-text btn btn-primary"
+                    id={course._id}
+                  >
+                    註冊課程
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
